@@ -1,5 +1,12 @@
+### Embed Files ###
+index/
+pdf/
+
 ### Zed ###
 .zed/
+
+### macOS ###
+.DS_Store
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
@@ -80,7 +87,7 @@ venv.bak/
 
 ### Python Patch ###
 # Poetry local configuration file - https://python-poetry.org/docs/configuration/#local-configuration
-poetry.toml
+# poetry.toml
 
 # ruff
 .ruff_cache/

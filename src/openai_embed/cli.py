@@ -242,20 +242,28 @@ def main():
     b.add_argument("--out", required=True, help="Directory to store the index")
     b.add_argument("--chunk-size", type=int, default=1200)
     b.add_argument("--overlap", type=int, default=200)
-    b.add_argument("--model", default="text-embedding-3-small")
+    b.add_argument("--model", default="text-embedding-3-large")
 
     s = sub.add_parser("search", help="Search the FAISS index with a query")
     s.add_argument("--out", required=True, help="Directory where index is stored")
     s.add_argument("--query", required=True, help="Search query")
     s.add_argument("--k", type=int, default=5)
-    s.add_argument("--model", default="text-embedding-3-small")
+    s.add_argument("--model", default="text-embedding-3-large")
 
     a = sub.add_parser("ask", help="Ask a question over the indexed PDF with RAG")
     a.add_argument("--out", required=True, help="Directory where index is stored")
     a.add_argument("--question", required=True, help="Your question")
     a.add_argument("--k", type=int, default=5)
-    a.add_argument("--embed-model", default="text-embedding-3-small", help="Embedding model used for retrieval")
-    a.add_argument("--gpt-model", default="gpt-4o-mini", help="GPT model used to generate the answer")
+    a.add_argument(
+        "--embed-model",
+        default="text-embedding-3-large",
+        help="Embedding model used for retrieval",
+    )
+    a.add_argument(
+        "--gpt-model",
+        default="gpt-4o-mini",
+        help="GPT model used to generate the answer",
+    )
     a.add_argument("--max-tokens", type=int, default=500)
     a.add_argument("--temperature", type=float, default=0.2)
 
@@ -305,6 +313,7 @@ def main():
             preview = r["text"].replace("\n", " ")
             print(
                 f"[score={r['score']:.3f}] id={r['id']} page={r.get('page')} chunk={r.get('chunk')} :: {preview[:200]}..."
+            )
 
     elif args.cmd == "ask":
         out_path = Path(args.out)
@@ -332,9 +341,13 @@ def main():
         context_blocks = []
         for r in retrieved:
             context_blocks.append(
-                f"[id={r['id']} page={r.get('page')} chunk={r.get('chunk')} score={r['score']:.3f}]\n{r.get('text','')}"
+                f"[id={r['id']} page={r.get('page')} chunk={r.get('chunk')} score={r['score']:.3f}]\n{r.get('text', '')}"
             )
-        context = "\n\n---\n\n".join(context_blocks) if context_blocks else "No relevant context found."
+        context = (
+            "\n\n---\n\n".join(context_blocks)
+            if context_blocks
+            else "No relevant context found."
+        )
 
         client = OpenAI()
         messages = [
@@ -363,7 +376,8 @@ def main():
         print("Answer:\n" + answer + "\n")
         print("Sources:")
         for r in retrieved:
-            print(f"- id={r['id']} page={r.get('page')} chunk={r.get('chunk')} score={r['score']:.3f}")
+            print(
+                f"- id={r['id']} page={r.get('page')} chunk={r.get('chunk')} score={r['score']:.3f}"
             )
 
 
